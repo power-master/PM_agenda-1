@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام اختيار المنتج — باور ماستر</title>
+<style>
+body{
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#1e90ff,#00bfff);
+  padding:30px;
+  color:#fff;
+  text-align:center;
+}
+h1,p{margin:5px 0}
+.box{
+  background:#fff;
+  color:#000;
+  padding:25px;
+  max-width:950px;
+  margin:auto;
+  border-radius:10px;
+  box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+select,input,button{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  font-size:16px;
+}
+button{
+  background:#1e90ff;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+button:hover{background:#00bfff}
+#finalTableContainer{
+  margin-top:40px;
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:10px;
+  display:none;
+}
+#finalTable{
+  width:100%;
+  border-collapse:collapse;
+}
+#finalTable th,#finalTable td{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+}
+#finalTable th{
+  background:#1e90ff;
+  color:#fff;
+}
+.qtyInput{
+  width:70px;
+  text-align:center;
+}
+.delBtn{
+  background:#ff4d4d;
+  padding:5px 10px;
+  font-size:13px;
+}
+.whatsBtn{
+  background:#25D366;
+  margin-top:15px;
+  font-size:18px;
+}
+.whatsBtn:hover{background:#1ebe5d}
+</style>
+</head>
+<body>
+
+<h1> باور ماستر للتوريدات الكهربائية والحلول الصناعية </h1>
+<p style="font-size:16px; color:#eee;">نؤمن بأن العلم هو الركيزة الأولى لكل إنجاز… لذلك نبني حلولنا على خبرة ومعرفة موثوقة</p>
+<h2>أجندة باور ماستر - نظام اختيار مواصفات المنتج</h2>
+
+<div class="box">
+  <label>اسم الشركة</label>
+  <input type="text" id="companyName" placeholder="اكتب اسم الشركة">
+  <label>اسم العميل</label>
+  <input type="text" id="clientName" placeholder="اكتب اسم العميل">
+  <hr>
+  <button onclick="resetSelection()">بند جديد</button>
+
+  <label>البراند</label>
+  <select id="brandSelect">
+    <option value="">اختر البراند</option>
+    <option value="Schneider">شنيدر</option>
+    <option value="Siemens">سيمنز</option>
+    <option value="ABB">ABB</option>
+  </select>
+
+  <label>نوع المنتج</label>
+  <select id="typeSelect"></select>
+
+  <label>الأمبير / Rating</label>
+  <select id="ampereSelect"></select>
+
+  <label id="poleLabel" style="display:none">عدد الأقطاب</label>
+  <select id="poleSelect" style="display:none"></select>
+
+  <label id="shortLabel" style="display:none">الشورت سيركت</label>
+  <select id="shortSelect" style="display:none"></select>
+
+  <label id="coilLabel" style="display:none">جهد التحكم</label>
+  <select id="coilSelect" style="display:none"></select>
+
+  <button id="addBtn" style="display:none">إضافة للجدول</button>
+</div>
+
+<div class="box" id="finalTableContainer">
+  <h2>البنود النهائية</h2>
+  <table id="finalTable">
+    <thead>
+      <tr>
+        <th>البراند</th>
+        <th>النوع</th>
+        <th>الأمبير / Rating</th>
+        <th>الأقطاب</th>
+        <th>الشورت</th>
+        <th>جهد التحكم</th>
+        <th>الوصف الكامل</th>
+        <th>كود المنتج</th>
+        <th>QTY</th>
+        <th>حذف</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="whatsBtn" onclick="sendWhatsApp()">📲 إرسال طلب عرض سعر عبر واتساب</button>
+</div>
+
+<script>
+const products=[
+  // Schneider
+  {Brand:"Schneider", Type:"MCB", Ampere:"1A", Pole:1, Short:50, Coil:null, Description:"MCB 1A, 50KA", Code:"A9F74101"},
+  {Brand:"Schneider", Type:"MCB", Ampere:"32A", Pole:2, Short:10, Coil:null, Description:"MCB 32A, 10KA", Code:"A9F77232"},
+  {Brand:"Schneider", Type:"Contactor", Ampere:"4KW", Pole:null, Short:null, Coil:"24VDC", Description:"Contactor 4KW, 24VDC Coil", Code:"LC1D09B7"},
+  {Brand:"Schneider", Type:"Contactor", Ampere:"11KW", Pole:null, Short:null, Coil:"220VAC", Description:"Contactor 11KW, 220VAC Coil", Code:"LC1D25M7"},
+  // Siemens
+  {Brand:"Siemens", Type:"MCB", Ampere:"10A", Pole:1, Short:6, Coil:null, Description:"Siemens MCB 10A, 6KA", Code:"S1MCB10"},
+  {Brand:"Siemens", Type:"MCB", Ampere:"20A", Pole:2, Short:10, Coil:null, Description:"Siemens MCB 20A, 10KA", Code:"S1MCB20"},
+  {Brand:"Siemens", Type:"Contactor", Ampere:"5.5KW", Pole:null, Short:null, Coil:"24VDC", Description:"Siemens Contactor 5.5KW, 24VDC Coil", Code:"S1C05K24V"},
+  // ABB
+  {Brand:"ABB", Type:"MCB", Ampere:"16A", Pole:1, Short:6, Coil:null, Description:"ABB MCB 16A, 6KA", Code:"A1MCB16"},
+  {Brand:"ABB", Type:"Contactor", Ampere:"7.5KW", Pole:null, Short:null, Coil:"24VDC", Description:"ABB Contactor 7.5KW, 24VDC Coil", Code:"A1C075K24V"}
+];
+
+const brand=brandSelect, type=typeSelect, amp=ampereSelect, pole=poleSelect, shortc=shortSelect;
+const coilSelect=document.getElementById("coilSelect");
+const coilLabel=document.getElementById("coilLabel");
+const poleLabel=document.getElementById("poleLabel");
+const shortLabel=document.getElementById("shortLabel");
+const addBtn=document.getElementById("addBtn");
+const tbody=document.querySelector("#finalTable tbody");
+const container=document.getElementById("finalTableContainer");
+
+function resetSelection(){
+  brand.value="";
+  type.innerHTML=amp.innerHTML=pole.innerHTML=shortc.innerHTML=coilSelect.innerHTML="";
+  poleLabel.style.display="none"; shortLabel.style.display="none"; coilLabel.style.display="none";
+  pole.style.display="none"; shortc.style.display="none"; coilSelect.style.display="none";
+  addBtn.style.display="none";
+}
+
+function updateFields(){
+  const filtered = products.filter(p=>p.Brand===brand.value && p.Type===type.value && p.Ampere==amp.value);
+
+  const poleValues = [...new Set(filtered.map(p=>p.Pole).filter(v=>v!=null))];
+  const shortValues= [...new Set(filtered.map(p=>p.Short).filter(v=>v!=null))];
+  const coilValues = [...new Set(filtered.map(p=>p.Coil).filter(v=>v!=null))];
+
+  if(poleValues.length){
+    poleLabel.style.display="block"; pole.style.display="block";
+    pole.innerHTML="<option value=''>اختر الأقطاب</option>";
+    poleValues.forEach(v=>pole.innerHTML+=`<option>${v}</option>`);
+  } else { poleLabel.style.display="none"; pole.style.display="none"; pole.innerHTML=""; }
+
+  if(shortValues.length){
+    shortLabel.style.display="block"; shortc.style.display="block";
+    shortc.innerHTML="<option value=''>اختر الشورت سيركت</option>";
+    shortValues.forEach(v=>shortc.innerHTML+=`<option>${v}</option>`); 
+  } else { shortLabel.style.display="none"; shortc.style.display="none"; shortc.innerHTML=""; }
+
+  if(coilValues.length){
+    coilLabel.style.display="block"; coilSelect.style.display="block";
+    coilSelect.innerHTML="<option value=''>اختر جهد التحكم</option>";
+    coilValues.forEach(v=>coilSelect.innerHTML+=`<option>${v}</option>`);
+  } else { coilLabel.style.display="none"; coilSelect.style.display="none"; coilSelect.innerHTML=""; }
+}
+
+brand.onchange=()=> {
+  type.innerHTML="<option value=''>اختر النوع</option>";
+  products.filter(p=>p.Brand===brand.value).map(p=>p.Type).filter((v,i,a)=>a.indexOf(v)==i)
+    .forEach(v=>type.innerHTML+=`<option>${v}</option>`);
+  amp.innerHTML=pole.innerHTML=shortc.innerHTML=coilSelect.innerHTML="";
+  poleLabel.style.display="none"; shortLabel.style.display="none"; coilLabel.style.display="none";
+  pole.style.display="none"; shortc.style.display="none"; coilSelect.style.display="none";
+};
+
+type.onchange=()=> {
+  amp.innerHTML="<option value=''>اختر الأمبير / Rating</option>";
+  products.filter(p=>p.Brand===brand.value && p.Type===type.value)
+    .map(p=>p.Ampere).filter((v,i,a)=>a.indexOf(v)==i).forEach(v=>amp.innerHTML+=`<option>${v}</option>`);
+  pole.innerHTML=shortc.innerHTML=coilSelect.innerHTML="";
+  poleLabel.style.display="none"; shortLabel.style.display="none"; coilLabel.style.display="none";
+  pole.style.display="none"; shortc.style.display="none"; coilSelect.style.display="none";
+};
+
+amp.onchange=()=>{ updateFields(); displayResult(); };
+[pole, shortc, coilSelect].forEach(el=>el.onchange=displayResult);
+
+function displayResult(){
+  const p=products.find(p=>{
+    return p.Brand===brand.value &&
+           p.Type===type.value &&
+           p.Ampere==amp.value &&
+           (p.Pole==pole.value || p.Pole==null) &&
+           (p.Short==shortc.value || p.Short==null) &&
+           (p.Type!=="Contactor" || coilSelect.value==p.Coil);
+  });
+  if(!p) return;
+  addBtn.style.display="block";
+  addBtn.onclick=()=>addToTable(p);
+}
+
+function addToTable(p){
+  container.style.display="block";
+  let row=[...tbody.rows].find(r=>r.dataset.code===p.Code);
+  if(row){
+    row.querySelector("input").value=parseInt(row.querySelector("input").value)+1;
+    return;
+  }
+  let tr=document.createElement("tr");
+  tr.dataset.code=p.Code;
+  tr.innerHTML=`
+    <td>${p.Brand}</td>
+    <td>${p.Type}</td>
+    <td>${p.Ampere}</td>
+    <td>${p.Pole?p.Pole:'—'}</td>
+    <td>${p.Short?p.Short+' KA':'—'}</td>
+    <td>${p.Coil?p.Coil:'—'}</td>
+    <td>${p.Description}</td>
+    <td><b>${p.Code}</b></td>
+    <td><input type="number" class="qtyInput" value="1" min="1"></td>
+    <td><button class="delBtn">حذف</button></td>`;
+  tr.querySelector(".delBtn").onclick=()=>{ tr.remove(); if(!tbody.rows.length) container.style.display="none"; };
+  tbody.appendChild(tr);
+}
+
+function sendWhatsApp(){
+  let company = companyName.value.trim();
+  let client  = clientName.value.trim();
+
+  if(!company || !client){
+    alert("يرجى إدخال اسم الشركة واسم العميل قبل إرسال الطلب.");
+    return;
+  }
+
+  if(!tbody.rows.length){ 
+    alert("لا توجد بنود لإرسالها"); 
+    return; 
+  }
+
+  let msg  = `*طلب عرض سعر*\nالشركة : ${company}\nالعميل  : ${client}\n──────────────────────\n`;
+  msg += "CODE        | QTY\n────────────────\n";
+  [...tbody.rows].forEach(r=>{
+    let code = r.cells[7].innerText.trim();  
+    let qty  = r.cells[8].querySelector("input").value; 
+    msg += `${code.padEnd(12," ")} | ${qty}\n`;
+  });
+  msg += "──────────────────────";
+  window.open(`https://wa.me/966564884782?text=${encodeURIComponent(msg)}`,"_blank");
+}
+</script>
+
+</body>
+</html>
