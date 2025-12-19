@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>نظام اختيار المنتج — باور ماستر</title>
+
 <style>
 body{
   font-family:sans-serif;
@@ -17,7 +18,7 @@ h1,p{margin:5px 0}
   background:#fff;
   color:#000;
   padding:25px;
-  max-width:950px;
+  max-width:1000px;
   margin:auto;
   border-radius:10px;
   box-shadow:0 0 20px rgba(0,0,0,.4);
@@ -27,6 +28,10 @@ select,input,button{
   padding:12px;
   margin:8px 0;
   font-size:16px;
+}
+select:disabled{
+  background:#f2f2f2;
+  color:#888;
 }
 button{
   background:#1e90ff;
@@ -42,6 +47,7 @@ button:hover{background:#00bfff}
   padding:20px;
   border-radius:10px;
   display:none;
+  overflow-x:auto;
 }
 #finalTable{
   width:100%;
@@ -73,167 +79,701 @@ button:hover{background:#00bfff}
 .whatsBtn:hover{background:#1ebe5d}
 </style>
 </head>
+
 <body>
 
-<h1> باور ماستر للتوريدات الكهربائية والحلول الصناعية </h1>
-<p style="font-size:16px; color:#eee;">نؤمن بأن العلم هو الركيزة الأولى لكل إنجاز… لذلك نبني حلولنا على خبرة ومعرفة موثوقة</p>
-<h2>أجندة باور ماستر - نظام اختيار مواصفات المنتج</h2>
+<h1>باور ماستر للتوريدات الكهربائية والحلول الصناعية</h1>
+<p style="font-size:16px;color:#eee;">
+نؤمن بأن العلم هو الركيزة الأولى لكل إنجاز… لذلك نبني حلولنا على خبرة ومعرفة موثوقة
+</p>
+
+<h2>نظام اختيار مواصفات المنتج</h2>
 
 <div class="box">
-  <label>اسم الشركة</label>
-  <input type="text" id="companyName" placeholder="اكتب اسم الشركة">
-  <label>اسم العميل</label>
-  <input type="text" id="clientName" placeholder="اكتب اسم العميل">
-  <hr>
-  <button onclick="resetSelection()">بند جديد</button>
 
-  <label>البراند</label>
-  <select id="brandSelect">
-    <option value="">اختر البراند</option>
-    <option value="Schneider">شنيدر</option>
-    <option value="Siemens">سيمنز</option>
-    <option value="ABB">ABB</option>
-  </select>
+<label>اسم الشركة / Company name</label>
+<input id="companyName" placeholder="اكتب اسم الشركة / Company name">
 
-  <label>نوع المنتج</label>
-  <select id="typeSelect"></select>
+<label>اسم العميل / Client name</label>
+<input id="clientName" placeholder="اكتب اسم العميل / Client name">
 
-  <label>الأمبير / Rating</label>
-  <select id="ampereSelect"></select>
+<hr>
+<button onclick="resetAll()">بند جديد / New</button>
 
-  <label id="poleLabel" style="display:none">عدد الأقطاب</label>
-  <select id="poleSelect" style="display:none"></select>
+<label>البراند / Brand</label>
+<select id="brand" disabled>
+  <option value="">اختر البراند / select brand</option>
+</select>
 
-  <label id="shortLabel" style="display:none">الشورت سيركت</label>
-  <select id="shortSelect" style="display:none"></select>
+<label>نوع المنتج / Type</label>
+<select id="type" disabled></select>
 
-  <label id="coilLabel" style="display:none">جهد التحكم</label>
-  <select id="coilSelect" style="display:none"></select>
+<label>الحمل / Rating</label>
+<select id="amp" disabled></select>
 
-  <button id="addBtn" style="display:none">إضافة للجدول</button>
+<label id="poleLabel" style="display:none">عدد النقط / No. of contacts</label>
+<select id="pole" style="display:none"></select>
+
+<label id="shortLabel" style="display:none">الشورت سيركت / Short circuit</label>
+<select id="short" style="display:none"></select>
+
+<label id="coilLabel" style="display:none">جهد التحكم / Control Voltage</label>
+<select id="coil" style="display:none"></select>
+
+<label id="auxLabel" style="display:none">النقط المساعدة / Aux.</label>
+<select id="aux" style="display:none"></select>
+
+<label id="otherLabel" style="display:none">مواصفات أخرى / Other</label>
+<select id="other" style="display:none"></select>
+
+<button id="addBtn" style="display:none">إضافة للجدول / Add</button>
+
 </div>
 
 <div class="box" id="finalTableContainer">
-  <h2>البنود النهائية</h2>
-  <table id="finalTable">
-    <thead>
-      <tr>
-        <th>البراند</th>
-        <th>النوع</th>
-        <th>الأمبير / Rating</th>
-        <th>الأقطاب</th>
-        <th>الشورت</th>
-        <th>جهد التحكم</th>
-        <th>الوصف الكامل</th>
-        <th>كود المنتج</th>
-        <th>QTY</th>
-        <th>حذف</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <button class="whatsBtn" onclick="sendWhatsApp()">📲 إرسال طلب عرض سعر عبر واتساب</button>
+<h2>البنود النهائية / Products</h2>
+
+<table id="finalTable">
+<thead>
+<tr>
+<th>البراند</th>
+<th>النوع</th>
+<th>Rating</th>
+<th>الأقطاب</th>
+<th>الشورت</th>
+<th>التحكم</th>
+<th>النقط المساعدة</th>
+<th>مواصفات أخرى</th>
+<th>الكود</th>
+<th>QTY</th>
+<th>حذف</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button class="whatsBtn" onclick="sendWhatsApp()">📲 إرسال طلب عرض سعر / Send quotation request</button>
 </div>
 
 <script>
-const products=[
-  // Schneider
-  {Brand:"Schneider", Type:"MCB", Ampere:"1A", Pole:1, Short:50, Coil:null, Description:"MCB 1A, 50KA", Code:"A9F74101"},
-  {Brand:"Schneider", Type:"MCB", Ampere:"32A", Pole:2, Short:10, Coil:null, Description:"MCB 32A, 10KA", Code:"A9F77232"},
-  {Brand:"Schneider", Type:"Contactor", Ampere:"4KW", Pole:null, Short:null, Coil:"24VDC", Description:"Contactor 4KW, 24VDC Coil", Code:"LC1D09B7"},
-  {Brand:"Schneider", Type:"Contactor", Ampere:"11KW", Pole:null, Short:null, Coil:"220VAC", Description:"Contactor 11KW, 220VAC Coil", Code:"LC1D25M7"},
-  // Siemens
-  {Brand:"Siemens", Type:"MCB", Ampere:"10A", Pole:1, Short:6, Coil:null, Description:"Siemens MCB 10A, 6KA", Code:"S1MCB10"},
-  {Brand:"Siemens", Type:"MCB", Ampere:"20A", Pole:2, Short:10, Coil:null, Description:"Siemens MCB 20A, 10KA", Code:"S1MCB20"},
-  {Brand:"Siemens", Type:"Contactor", Ampere:"5.5KW", Pole:null, Short:null, Coil:"24VDC", Description:"Siemens Contactor 5.5KW, 24VDC Coil", Code:"S1C05K24V"},
-  // ABB
-  {Brand:"ABB", Type:"MCB", Ampere:"16A", Pole:1, Short:6, Coil:null, Description:"ABB MCB 16A, 6KA", Code:"A1MCB16"},
-  {Brand:"ABB", Type:"Contactor", Ampere:"7.5KW", Pole:null, Short:null, Coil:"24VDC", Description:"ABB Contactor 7.5KW, 24VDC Coil", Code:"A1C075K24V"}
+// ===================== DATA =====================
+const products = [
+  {Brand:"Schneider",Type:"MCB",Ampere:"1A",Pole:"1P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F74101"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"2A",Pole:"1P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F74102"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"3A",Pole:"1P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F74103"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"4A",Pole:"1P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F74104"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77106"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77110"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77116"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77120"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77125"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77132"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77140"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77163"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"2A",Pole:"2P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F74202"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"4A",Pole:"2P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F74204"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77206"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77210"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77216"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77220"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77225"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77232"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77240"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77263"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77306"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77310"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77316"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77320"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77325"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77332"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77340"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77363"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77406"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77410"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77416"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77420"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77425"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77432"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77440"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F77463"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"80A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18357"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"80A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18361"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"80A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18365"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"80A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18372"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18358"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18362"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18367"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18374"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"125A",Pole:"1P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18359"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"125A",Pole:"2P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18363"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"125A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18369"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"125A",Pole:"4P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18377"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87106"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87110"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87116"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87120"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87125"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87132"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87140"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"1P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87163"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87206"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87210"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87216"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87220"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87232"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87240"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87225"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87263"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87310"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87320"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87325"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87332"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87340"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87316"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87363"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87410"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87416"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87420"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87425"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87432"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87440"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9F87463"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"80A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18457"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"80A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18468"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"2P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18458"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18469"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"125A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18470"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"100A",Pole:"4P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"A9N18480"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32110"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32116"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32120"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32125"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32132"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32140"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32106"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"1P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32163"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32206"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32210"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32216"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32220"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32225"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32232"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32240"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"2P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32263"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32306"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32310"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32316"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32320"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32325"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32332"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32340"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"3P",Short:"4.5KA",Coil:null,Auxiliary:null,Other:null,Code:"R9F32363"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24110"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24116"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24120"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24125"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24132"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24140"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"2A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24102"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24106"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"1P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24163"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24206"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24210"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24216"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24220"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24225"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24232"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24240"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"2P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24263"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"6A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24306"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"10A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24310"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"16A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24316"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"20A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24320"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"25A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24325"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"32A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24332"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"40A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24340"},
+  {Brand:"Schneider",Type:"MCB",Ampere:"63A",Pole:"3P",Short:"6KA",Coil:null,Auxiliary:null,Other:null,Code:"A9K24363"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"25A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F25"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"32A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F32"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"40A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F40"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F63"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"80A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F80"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"10KA",Coil:null,Auxiliary:null,Other:null,Code:"G12T3F125"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"25A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F25"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"32A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F32"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"40A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F40"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F63"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"80A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F80"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"15KA",Coil:null,Auxiliary:null,Other:null,Code:"G12E3F125"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"25A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F25"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"32A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F32"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"40A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F40"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F63"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"80A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F80"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"30KA",Coil:null,Auxiliary:null,Other:null,Code:"G12F3F125"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"G20B3A160"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"G20B3A200"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"G25B3A250"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"G20F3A160"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"G20F3A200"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"G25F3A250"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"G40F3A400"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"G40N3A400"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"G80N3E630"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"800A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"G80N3E800"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510307"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"80A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510306"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510305"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"40A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510303"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"32A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510302"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"25A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510301"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV516302"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV516303"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV525302"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"LV525303"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510337"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"80A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510336"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510335"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"40A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510333"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"32A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510332"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"25A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV510331"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV516332"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"60A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV516333"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV525332"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV525333"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV540306"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"LV540316"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"500A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV563305"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"600A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV563306"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"500A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"LV563315"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"600A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"LV563316"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV540505"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"LV540510"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"LV563505"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"LV563510"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C10B3TM100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C16B3TM125"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C16B3TM160"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C25B3TM200"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"3P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C25B3TM250"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C10F3TM100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C16F3TM125"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C16F3TM160"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C25F3TM200"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C25F3TM250"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C40F32D400"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"3P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C63F32D630"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"C40N32D400"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"3P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"C63N32D630"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"40A",Pole:"4P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C10B6TM040"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"4P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C10B6TM063"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"80A",Pole:"4P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C10B6TM080"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"100A",Pole:"4P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C10B6TM100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"4P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C16B6TM160"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"4P",Short:"25KA",Coil:null,Auxiliary:null,Other:null,Code:"C25B6TM250"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C10F6TM100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"63A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C10F6TM100"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"125A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C16F6TM125"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"160A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C16F6TM160"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"200A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C25F6TM200"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"250A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C25F6TM250"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C40F42D400"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"4P",Short:"36KA",Coil:null,Auxiliary:null,Other:null,Code:"C63F42D630"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"400A",Pole:"4P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"C40N42D400"},
+  {Brand:"Schneider",Type:"MCCB",Ampere:"630A",Pole:"4P",Short:"50KA",Coil:null,Auxiliary:null,Other:null,Code:"C63N42D630"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"10mA",Code:"A9R10225"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R41225"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"40A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R41240"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"63A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R41263"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"100A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R11291"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R41425"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"40A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R41440"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"63A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R41463"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"80A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R11480"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"100A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9R11491"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R44225"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"40A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R44240"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"63A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R44263"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R44425"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"40A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R44440"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"63A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R44463"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"80A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R14480"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"100A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"300mA",Code:"A9R14491"},
+  {Brand:"Schneider",Type:"RCBO",Ampere:"10A",Pole:"1P+ N",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9D11810"},
+  {Brand:"Schneider",Type:"RCBO",Ampere:"16A",Pole:"1P+ N",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9D11816"},
+  {Brand:"Schneider",Type:"RCBO",Ampere:"20A",Pole:"1P+ N",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9D11820"},
+  {Brand:"Schneider",Type:"RCBO",Ampere:"25A",Pole:"1P+ N",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9D11825"},
+  {Brand:"Schneider",Type:"RCBO",Ampere:"32A",Pole:"1P+ N",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9D11832"},
+  {Brand:"Schneider",Type:"RCBO",Ampere:"40A",Pole:"1P+ N",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"A9D11840"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"R9R51225"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"40A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"R9R51240"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"63A",Pole:"2P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"R9R51263"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"25A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"R9R51425"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"40A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"R9R51440"},
+  {Brand:"Schneider",Type:"RCCB",Ampere:"63A",Pole:"4P",Short:null,Coil:null,Auxiliary:null,Other:"30mA",Code:"R9R51463"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"4KW, 9A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D09B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"4KW, 9A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D09F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"4KW, 9A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D09M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"4KW, 9A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D09Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"5.5KW, 12A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D12B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"5.5KW, 12A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D12F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"5.5KW, 12A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D12M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"5.5KW, 12A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D12Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"7.5KW, 18A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D18B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"7.5KW, 18A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D18F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"7.5KW, 18A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D18M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"7.5KW, 18A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D18Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"11KW, 25A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D25B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"11KW, 25A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D25F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"11KW, 25A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D25M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"11KW, 25A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D25Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"15KW, 32A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D32B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"15KW, 32A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D32F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"15KW, 32A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D32M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"15KW, 32A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D32Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 38A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D38B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 38A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D38F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 38A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D38M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 38A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D38Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 40A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D40AB7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 40A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D40AF7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 40A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D40AM7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 40A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D40AQ7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"22KW, 50A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D50AB7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"22KW, 50A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D50AF7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"22KW, 50A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D50AM7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"22KW, 50A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D50AQ7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"30KW, 65A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D65AB7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"30KW, 65A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D65AF7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"30KW, 65A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D65AM7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"30KW, 65A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D65AQ7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D80AB7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D80AF7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D80AM7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D80AQ7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D80B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D80F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D80M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D80Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"45KW, 95A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D95B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"45KW, 95A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D95F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"45KW, 95A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D95M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"45KW, 95A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D95Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"55KW, 115A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D115B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"55KW, 115A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D115F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"55KW, 115A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D115M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"55KW, 115A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D115Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"75KW, 150A",Pole:"3P(3NO)",Short:null,Coil:"24VAC",Auxiliary:null,Other:null,Code:"LC1D150B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"75KW, 150A",Pole:"3P(3NO)",Short:null,Coil:"110VAC",Auxiliary:null,Other:null,Code:"LC1D150F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"75KW, 150A",Pole:"3P(3NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D150M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"75KW, 150A",Pole:"3P(3NO)",Short:null,Coil:"380VAC",Auxiliary:null,Other:null,Code:"LC1D150Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"4KW, 9A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D09BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"5.5KW, 12A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D12BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"7.5KW, 18A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D18BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"11KW, 25A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D25BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"15KW, 32A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D32BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 38A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D38BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 40A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D40ABBE / BNE"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"22KW, 50A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D50ABBE / BNE"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"30KW, 65A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D65ABBE / BNE"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 80A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1D80BD"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"4KW, 20A",Pole:" 4P(2NO+2NC)",Short:null,Coil:"230VAC",Auxiliary:null,Other:null,Code:"LC1D098P7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"5.5KW, 25A",Pole:" 4P(2NO+2NC)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D128M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"7.5KW, 32A",Pole:" 4P(2NO+2NC)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D188M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"11KW, 40A",Pole:" 4P(2NO+2NC)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D258M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"18.5KW, 60A",Pole:" 4P(2NO+2NC)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D40008M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"37KW, 125A",Pole:" 4P(2NO+2NC)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1D80004M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"20A (AC-1)",Pole:"4P(4NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1DT20M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"25A (AC-1)",Pole:"4P(4NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1DT25M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"32A (AC-1)",Pole:"4P(4NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1DT32M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"40A (AC-1)",Pole:"4P(4NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1DT40M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"60A (AC-1)",Pole:"4P(4NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1DT60AM7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"80A (AC-1)",Pole:"4P(4NO)",Short:null,Coil:"220VAC",Auxiliary:null,Other:null,Code:"LC1DT80AM7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"90KW, 185A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1F185B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"90KW, 185A",Pole:"3P(3NO)",Short:null,Coil:"110VDC",Auxiliary:null,Other:null,Code:"LC1F185F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"90KW, 185A",Pole:"3P(3NO)",Short:null,Coil:"220VDC",Auxiliary:null,Other:null,Code:"LC1F185M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"90KW, 185A",Pole:"3P(3NO)",Short:null,Coil:"380VDC",Auxiliary:null,Other:null,Code:"LC1F185Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"132KW, 265A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1F265B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"132KW, 265A",Pole:"3P(3NO)",Short:null,Coil:"110VDC",Auxiliary:null,Other:null,Code:"LC1F265F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"132KW, 265A",Pole:"3P(3NO)",Short:null,Coil:"220VDC",Auxiliary:null,Other:null,Code:"LC1F265M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"132KW, 265A",Pole:"3P(3NO)",Short:null,Coil:"380VDC",Auxiliary:null,Other:null,Code:"LC1F265Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"160KW, 330A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1F330B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"160KW, 330A",Pole:"3P(3NO)",Short:null,Coil:"110VDC",Auxiliary:null,Other:null,Code:"LC1F330F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"160KW, 330A",Pole:"3P(3NO)",Short:null,Coil:"220VDC",Auxiliary:null,Other:null,Code:"LC1F330M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"160KW, 330A",Pole:"3P(3NO)",Short:null,Coil:"380VDC",Auxiliary:null,Other:null,Code:"LC1F330Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"200KW, 400A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1F400B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"200KW, 400A",Pole:"3P(3NO)",Short:null,Coil:"110VDC",Auxiliary:null,Other:null,Code:"LC1F400F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"200KW, 400A",Pole:"3P(3NO)",Short:null,Coil:"220VDC",Auxiliary:null,Other:null,Code:"LC1F400M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"200KW, 400A",Pole:"3P(3NO)",Short:null,Coil:"380VDC",Auxiliary:null,Other:null,Code:"LC1F400Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"250KW, 500A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1F500B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"250KW, 500A",Pole:"3P(3NO)",Short:null,Coil:"110VDC",Auxiliary:null,Other:null,Code:"LC1F500F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"250KW, 500A",Pole:"3P(3NO)",Short:null,Coil:"220VDC",Auxiliary:null,Other:null,Code:"LC1F500M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"250KW, 500A",Pole:"3P(3NO)",Short:null,Coil:"380VDC",Auxiliary:null,Other:null,Code:"LC1F500Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"335KW, 630A",Pole:"3P(3NO)",Short:null,Coil:"24VDC",Auxiliary:null,Other:null,Code:"LC1F630B7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"335KW, 630A",Pole:"3P(3NO)",Short:null,Coil:"110VDC",Auxiliary:null,Other:null,Code:"LC1F630F7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"335KW, 630A",Pole:"3P(3NO)",Short:null,Coil:"220VDC",Auxiliary:null,Other:null,Code:"LC1F630M7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"335KW, 630A",Pole:"3P(3NO)",Short:null,Coil:"380VDC",Auxiliary:null,Other:null,Code:"LC1F630Q7"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"55KW, 115A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G115KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"75KW, 150A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G150KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"90KW, 185A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G185KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"110KW, 225A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G225KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"132KW, 265A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G265KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"160KW, 330A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G330KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"200KW, 400A",Pole:"3P(3NO)",Short:null,Coil:"100 250VAC/DC",Auxiliary:null,Other:null,Code:"LC1G400KUEN"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"55KW, 115A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G115LSEA"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"75KW, 150A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G150LSEA"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"90KW, 185A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G185LSEA"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"110KW, 225A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G225LSEA"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"132KW, 265A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G265LSEA"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"160KW, 330A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G330LSEA"},
+  {Brand:"Schneider",Type:"Contactor",Ampere:"200KW, 400A",Pole:"3P(3NO)",Short:null,Coil:"200 500VAC/DC",Auxiliary:null,Other:null,Code:"LC1G400LSEA"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(0.25...0.4)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD03"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(0.4...0.63)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD04"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(0.63...1.0)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD05"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(1.0...1.6)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD06"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(1.6...2.5)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD07"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(2.5...4)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD08"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(4...6)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD10"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(5.5...8)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD12"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(7...10)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D09:D38)",Code:"LRD14"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(9...13)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D12:D38)",Code:"LRD16"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(12...18)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D18:D38)",Code:"LRD21"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(16...24)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D25:D38)",Code:"LRD22"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(23...32)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D25:D38)",Code:"LRD32"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(30...38A)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D32:D38)",Code:"LRD35"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(17...25)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D40:D95)",Code:"LRD325L"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(17...25)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D40:D95)",Code:"LRD325"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(23...32)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D40:D95)",Code:"LRD332"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(30...40)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D40:D95)",Code:"LRD340"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(37...50)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D50:D95)",Code:"LRD350"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(48...65)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D50:D95)",Code:"LRD365"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(55...70)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D65:D95)",Code:"LRD3361"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(62...80)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D80A)",Code:"LRD380"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(63...80)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D80:D95)",Code:"LRD3363"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(80...104)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D80:D95)",Code:"LRD3365"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(80...104)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D115:D150)",Code:"LRD4365"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(95...120)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D115:D150)",Code:"LRD4367"},
+  {Brand:"Schneider",Type:"Over load",Ampere:"(110...140)A",Pole:null,Short:null,Coil:null,Auxiliary:null,Other:"For contactor (D150)",Code:"LRD4369"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(0.16...0.25)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME02"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(0.25...0.4)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME03"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(0.4...0.63)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME04"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(0.6...1)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME05"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(1...1.6)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME06"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(1.6...2.5)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME07"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(2.5...4)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME08"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(4...6)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME10"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(6.3...10)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME14"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(9 14)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME16"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(13...18)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME20"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(17...23)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME21"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(20...25)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME22"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(24...32)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV2ME32"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(30...40)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV3P40"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(37...50)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV3P50"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(48...65)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV3P65"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(65...73)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV3P73"},
+  {Brand:"Schneider",Type:"MMS",Ampere:"(70...80)A",Pole:"3P",Short:null,Coil:null,Auxiliary:null,Other:null,Code:"GV3P80"},
+  {Brand:"Schneider",Type:"Push button",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BA21"},
+  {Brand:"Schneider",Type:"Push button",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Green",Code:"XB4BA31"},
+  {Brand:"Schneider",Type:"Push button",Ampere:"NA",Pole:"1NC",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Red",Code:"XB4BA42"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Metal, Green",Code:"XB4BW33B5"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Metal, Orange",Code:"XB4BW35B5"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Green",Code:"XB4BW33M5"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Red",Code:"XB4BW34M5"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"W/o led",Auxiliary:null,Other:"Metal, Green",Code:"XB4BW3365"},
+  {Brand:"Schneider",Type:"Illuminated selector 2pos",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Green",Code:"XB4BK123M5"},
+  {Brand:"Schneider",Type:"Illuminated selector 2pos",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Red",Code:"XB4BK124M5"},
+  {Brand:"Schneider",Type:"Double push button",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Red",Code:"XB4BL73415"},
+  {Brand:"Schneider",Type:"Selector 2pos",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BD21"},
+  {Brand:"Schneider",Type:"Selector 2pos",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BD25"},
+  {Brand:"Schneider",Type:"Selector 3pos",Ampere:"NA",Pole:"2NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BD33"},
+  {Brand:"Schneider",Type:"Selector 2pos",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BD41"},
+  {Brand:"Schneider",Type:"Selector 3pos",Ampere:"NA",Pole:"2NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BD53"},
+  {Brand:"Schneider",Type:"Illuminated selector 2pos",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Metal, Red",Code:"XB4BK124B5"},
+  {Brand:"Schneider",Type:"Key selector 2pos",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BG21"},
+  {Brand:"Schneider",Type:"Key selector 3pos",Ampere:"NA",Pole:"2NO",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Black",Code:"XB4BG33"},
+  {Brand:"Schneider",Type:"Emergency stop",Ampere:"NA",Pole:"1NC",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Red",Code:"XB4BS8442"},
+  {Brand:"Schneider",Type:"Key emergency stop",Ampere:"NA",Pole:"1NC",Short:null,Coil:null,Auxiliary:null,Other:"Metal, Red",Code:"XB4BS9442"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Green",Code:"XB4BVM3"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Red",Code:"XB4BVM4"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Metal, Orange",Code:"XB4BVM5"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Metal, Green",Code:"XB4BVB3"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Metal, Red",Code:"XB4BVB4"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Metal, Orange",Code:"XB4BVB5"},
+  {Brand:"Schneider",Type:"Push button",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2EA21"},
+  {Brand:"Schneider",Type:"Push button",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Green",Code:"XA2EA31"},
+  {Brand:"Schneider",Type:"Push button",Ampere:"NA",Pole:"1NC",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Red",Code:"XA2EA42"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Plastic, White",Code:"XA2EVB1LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Plastic, Green",Code:"XA2EVB3LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Plastic, Red",Code:"XA2EVB4LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Plastic, Orange",Code:"XA2EVB5LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Plastic, Blue",Code:"XA2EVB6LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Plastic, White",Code:"XA2EVM1LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Plastic, Green",Code:"XA2EVM3LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Plastic, Red",Code:"XA2EVM4LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Plastic, Orange",Code:"XA2EVM5LC"},
+  {Brand:"Schneider",Type:"Pilot light",Ampere:"NA",Pole:null,Short:null,Coil:"240VAC",Auxiliary:null,Other:"Plastic, Blue",Code:"XA2EVM6LC"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO",Short:null,Coil:"24VAC/DC",Auxiliary:null,Other:"Plastic, Green",Code:"XA2EW33B1"},
+  {Brand:"Schneider",Type:"Illuminated push button",Ampere:"NA",Pole:"1NO",Short:null,Coil:"240VAC",Auxiliary:null,Other:"Plastic, Green",Code:"XA2EW33M1"},
+  {Brand:"Schneider",Type:"Selector 2pos",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2ED21"},
+  {Brand:"Schneider",Type:"Selector 2pos",Ampere:"NA",Pole:"1NO+1NC",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2ED25"},
+  {Brand:"Schneider",Type:"Selector 3pos",Ampere:"NA",Pole:"2NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2ED33"},
+  {Brand:"Schneider",Type:"Selector 2pos",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2ED41"},
+  {Brand:"Schneider",Type:"Selector 3pos",Ampere:"NA",Pole:"2NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2ED53"},
+  {Brand:"Schneider",Type:"Key selector 2pos",Ampere:"NA",Pole:"1NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2EG21"},
+  {Brand:"Schneider",Type:"Key selector 3pos",Ampere:"NA",Pole:"2NO",Short:null,Coil:null,Auxiliary:null,Other:"Plastic, Black",Code:"XA2EG33"},
+
+
+  {Brand:"Siemens",Type:"MCB",Ampere:"10A",Pole:1,Short:6,Coil:null,Auxiliary:["1NO"],Other:["Special1"],Code:"S1MCB10"},
+  {Brand:"Siemens",Type:"MCB",Ampere:"20A",Pole:2,Short:10,Coil:null,Auxiliary:["1NO","1NC"],Other:["Special2"],Code:"S1MCB20"},
+  {Brand:"Siemens",Type:"Contactor",Ampere:"5.5KW",Pole:null,Short:null,Coil:"24VDC",Auxiliary:["2NO+2NC"],Other:["Special3"],Code:"S1C05K24V"},
+
+  {Brand:"ABB",Type:"MCB",Ampere:"16A",Pole:1,Short:6,Coil:null,Auxiliary:["1NO"],Other:["Special1"],Code:"A1MCB16"},
+  {Brand:"ABB",Type:"Contactor",Ampere:"7.5KW",Pole:null,Short:null,Coil:"24VDC",Auxiliary:["2NO"],Other:["Special2"],Code:"A1C075K24V"}
 ];
 
-const brand=brandSelect, type=typeSelect, amp=ampereSelect, pole=poleSelect, shortc=shortSelect;
-const coilSelect=document.getElementById("coilSelect");
-const coilLabel=document.getElementById("coilLabel");
-const poleLabel=document.getElementById("poleLabel");
-const shortLabel=document.getElementById("shortLabel");
-const addBtn=document.getElementById("addBtn");
-const tbody=document.querySelector("#finalTable tbody");
-const container=document.getElementById("finalTableContainer");
+// ===================== ELEMENTS =====================
+const brand = document.getElementById("brand");
+const type  = document.getElementById("type");
+const amp   = document.getElementById("amp");
+const pole  = document.getElementById("pole");
+const shortc= document.getElementById("short");
+const coil  = document.getElementById("coil");
+const aux   = document.getElementById("aux");
+const other = document.getElementById("other");
 
-function resetSelection(){
-  brand.value="";
-  type.innerHTML=amp.innerHTML=pole.innerHTML=shortc.innerHTML=coilSelect.innerHTML="";
-  poleLabel.style.display="none"; shortLabel.style.display="none"; coilLabel.style.display="none";
-  pole.style.display="none"; shortc.style.display="none"; coilSelect.style.display="none";
+const addBtn = document.getElementById("addBtn");
+const tbody  = document.querySelector("#finalTable tbody");
+const container = document.getElementById("finalTableContainer");
+
+// ===================== INIT =====================
+resetAll();
+
+// ===================== FUNCTIONS =====================
+function resetAll(){
+  brand.innerHTML = `<option value="">اختر البراند</option>`;
+  [...new Set(products.map(p=>p.Brand))].forEach(b=>{
+    brand.innerHTML+=`<option>${b}</option>`;
+  });
+  brand.disabled=false;
+  resetBelow("brand");
+}
+
+function resetBelow(level){
+  if(level==="brand"){
+    type.innerHTML=`<option value="">اختر النوع</option>`;
+    type.disabled=true;
+  }
+  if(["brand","type"].includes(level)){
+    amp.innerHTML=`<option value="">اختر Rating</option>`;
+    amp.disabled=true;
+  }
+  hideOptional();
   addBtn.style.display="none";
 }
 
-function updateFields(){
-  const filtered = products.filter(p=>p.Brand===brand.value && p.Type===type.value && p.Ampere==amp.value);
-
-  const poleValues = [...new Set(filtered.map(p=>p.Pole).filter(v=>v!=null))];
-  const shortValues= [...new Set(filtered.map(p=>p.Short).filter(v=>v!=null))];
-  const coilValues = [...new Set(filtered.map(p=>p.Coil).filter(v=>v!=null))];
-
-  if(poleValues.length){
-    poleLabel.style.display="block"; pole.style.display="block";
-    pole.innerHTML="<option value=''>اختر الأقطاب</option>";
-    poleValues.forEach(v=>pole.innerHTML+=`<option>${v}</option>`);
-  } else { poleLabel.style.display="none"; pole.style.display="none"; pole.innerHTML=""; }
-
-  if(shortValues.length){
-    shortLabel.style.display="block"; shortc.style.display="block";
-    shortc.innerHTML="<option value=''>اختر الشورت سيركت</option>";
-    shortValues.forEach(v=>shortc.innerHTML+=`<option>${v}</option>`); 
-  } else { shortLabel.style.display="none"; shortc.style.display="none"; shortc.innerHTML=""; }
-
-  if(coilValues.length){
-    coilLabel.style.display="block"; coilSelect.style.display="block";
-    coilSelect.innerHTML="<option value=''>اختر جهد التحكم</option>";
-    coilValues.forEach(v=>coilSelect.innerHTML+=`<option>${v}</option>`);
-  } else { coilLabel.style.display="none"; coilSelect.style.display="none"; coilSelect.innerHTML=""; }
-}
-
-brand.onchange=()=> {
-  type.innerHTML="<option value=''>اختر النوع</option>";
-  products.filter(p=>p.Brand===brand.value).map(p=>p.Type).filter((v,i,a)=>a.indexOf(v)==i)
-    .forEach(v=>type.innerHTML+=`<option>${v}</option>`);
-  amp.innerHTML=pole.innerHTML=shortc.innerHTML=coilSelect.innerHTML="";
-  poleLabel.style.display="none"; shortLabel.style.display="none"; coilLabel.style.display="none";
-  pole.style.display="none"; shortc.style.display="none"; coilSelect.style.display="none";
-};
-
-type.onchange=()=> {
-  amp.innerHTML="<option value=''>اختر الأمبير / Rating</option>";
-  products.filter(p=>p.Brand===brand.value && p.Type===type.value)
-    .map(p=>p.Ampere).filter((v,i,a)=>a.indexOf(v)==i).forEach(v=>amp.innerHTML+=`<option>${v}</option>`);
-  pole.innerHTML=shortc.innerHTML=coilSelect.innerHTML="";
-  poleLabel.style.display="none"; shortLabel.style.display="none"; coilLabel.style.display="none";
-  pole.style.display="none"; shortc.style.display="none"; coilSelect.style.display="none";
-};
-
-amp.onchange=()=>{ updateFields(); displayResult(); };
-[pole, shortc, coilSelect].forEach(el=>el.onchange=displayResult);
-
-function displayResult(){
-  const p=products.find(p=>{
-    return p.Brand===brand.value &&
-           p.Type===type.value &&
-           p.Ampere==amp.value &&
-           (p.Pole==pole.value || p.Pole==null) &&
-           (p.Short==shortc.value || p.Short==null) &&
-           (p.Type!=="Contactor" || coilSelect.value==p.Coil);
+function hideOptional(){
+  ["pole","short","coil","aux","other"].forEach(id=>{
+    document.getElementById(id).style.display="none";
+    document.getElementById(id+"Label").style.display="none";
+    document.getElementById(id).innerHTML="";
   });
-  if(!p) return;
-  addBtn.style.display="block";
-  addBtn.onclick=()=>addToTable(p);
 }
 
+function populate(select,values,label){
+  select.innerHTML=`<option value="">${label}</option>`;
+  values.forEach(v=>select.innerHTML+=`<option>${v}</option>`);
+  select.disabled=false;
+}
+
+function getFiltered(){
+  return products.filter(p=>
+    p.Brand===brand.value &&
+    p.Type===type.value &&
+    p.Ampere===amp.value
+  );
+}
+
+// ===================== EVENTS =====================
+brand.onchange=()=>{
+  resetBelow("brand");
+  populate(
+    type,
+    [...new Set(products.filter(p=>p.Brand===brand.value).map(p=>p.Type))],
+    "اختر النوع"
+  );
+};
+
+type.onchange=()=>{
+  resetBelow("type");
+  populate(
+    amp,
+    [...new Set(products.filter(p=>p.Brand===brand.value && p.Type===type.value).map(p=>p.Ampere))],
+    "اختر Rating"
+  );
+};
+
+amp.onchange=()=>{
+  hideOptional();
+  const list = getFiltered();
+
+  const poles  = [...new Set(list.map(p=>p.Pole).filter(v=>v!=null))];
+  const shorts = [...new Set(list.map(p=>p.Short).filter(v=>v!=null))];
+  const coils  = [...new Set(list.map(p=>p.Coil).filter(v=>v!=null))];
+  const auxs   = [...new Set(list.flatMap(p=>p.Auxiliary || []))];
+  const others = [...new Set(list.flatMap(p=>p.Other || []))];
+
+  if(poles.length){
+    populate(pole,poles,"اختر عدد النقط");
+    pole.style.display=poleLabel.style.display="block";
+  }
+  if(shorts.length){
+    populate(shortc,shorts,"اختر الشورت");
+    shortc.style.display=shortLabel.style.display="block";
+  }
+  if(coils.length){
+    populate(coil,coils,"اختر جهد التحكم");
+    coil.style.display=coilLabel.style.display="block";
+  }
+  if(auxs.length){
+    populate(aux,auxs,"اختر النقط المساعدة");
+    aux.style.display=auxLabel.style.display="block";
+  }
+  if(others.length){
+    populate(other,others,"اختر المواصفات الأخرى");
+    other.style.display=otherLabel.style.display="block";
+  }
+  checkReady();
+};
+
+[pole,shortc,coil,aux,other].forEach(el=>el.onchange=checkReady);
+
+function checkReady(){
+  const list = getFiltered();
+  const product = list.find(p=>
+    (!p.Pole  || pole.value==p.Pole) &&
+    (!p.Short || shortc.value==p.Short) &&
+    (!p.Coil  || coil.value==p.Coil) &&
+    (!p.Auxiliary || aux.value && p.Auxiliary.includes(aux.value)) &&
+    (!p.Other || other.value && p.Other.includes(other.value))
+  );
+  if(product){
+    addBtn.style.display="block";
+    addBtn.onclick=()=>addToTable(product);
+  }else{
+    addBtn.style.display="none";
+  }
+}
+
+// ===================== TABLE =====================
 function addToTable(p){
   container.style.display="block";
   let row=[...tbody.rows].find(r=>r.dataset.code===p.Code);
   if(row){
-    row.querySelector("input").value=parseInt(row.querySelector("input").value)+1;
+    row.querySelector("input").value++;
     return;
   }
   let tr=document.createElement("tr");
@@ -242,43 +782,36 @@ function addToTable(p){
     <td>${p.Brand}</td>
     <td>${p.Type}</td>
     <td>${p.Ampere}</td>
-    <td>${p.Pole?p.Pole:'—'}</td>
-    <td>${p.Short?p.Short+' KA':'—'}</td>
-    <td>${p.Coil?p.Coil:'—'}</td>
-    <td>${p.Description}</td>
+    <td>${p.Pole||"—"}</td>
+    <td>${p.Short?p.Short+"":"—"}</td>
+    <td>${p.Coil||"—"}</td>
+    <td>${aux.value||"—"}</td>
+    <td>${other.value||"—"}</td>
     <td><b>${p.Code}</b></td>
-    <td><input type="number" class="qtyInput" value="1" min="1"></td>
+    <td><input class="qtyInput" type="number" value="1" min="1"></td>
     <td><button class="delBtn">حذف</button></td>`;
-  tr.querySelector(".delBtn").onclick=()=>{ tr.remove(); if(!tbody.rows.length) container.style.display="none"; };
+  tr.querySelector(".delBtn").onclick=()=>{
+    tr.remove();
+    if(!tbody.rows.length) container.style.display="none";
+  };
   tbody.appendChild(tr);
 }
 
+// ===================== WHATSAPP =====================
 function sendWhatsApp(){
-  let company = companyName.value.trim();
-  let client  = clientName.value.trim();
-
-  if(!company || !client){
-    alert("يرجى إدخال اسم الشركة واسم العميل قبل إرسال الطلب.");
+  if(!companyName.value || !clientName.value){
+    alert("يرجى إدخال اسم الشركة واسم العميل");
     return;
   }
-
-  if(!tbody.rows.length){ 
-    alert("لا توجد بنود لإرسالها"); 
-    return; 
-  }
-
-  let msg  = `*طلب عرض سعر*\nالشركة : ${company}\nالعميل  : ${client}\n──────────────────────\n`;
-  msg += "CODE        | QTY\n────────────────\n";
+  let msg=`*طلب عرض سعر*\nالشركة : ${companyName.value}\nالعميل  : ${clientName.value}\n────────────────────\n`;
+  msg+="CODE        | QTY\n────────────────\n";
   [...tbody.rows].forEach(r=>{
-    let code = r.cells[7].innerText.trim();  
-    let qty  = r.cells[8].querySelector("input").value; 
-    msg += `${code.padEnd(12," ")} | ${qty}\n`;
+    msg+=`${r.dataset.code.padEnd(12)} | ${r.cells[9].querySelector("input").value}\n`;
   });
-  msg += "──────────────────────";
-  window.open(`https://wa.me/966564884782?text=${encodeURIComponent(msg)}`,"_blank");
+  msg+="────────────────────";
+  window.open(`https://wa.me/966564884782?text=${encodeURIComponent(msg)}`);
 }
 </script>
 
 </body>
 </html>
-
